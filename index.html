@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Slideshow Surprise! (PKCE + Controls)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/spotify_player.css">
+    <link rel="icon" href="data:,">
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-pink-200 via-purple-200 to-indigo-200 p-4">
+
+    <div id="app-container" class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 md:p-8 text-center">
+
+        <h1 id="main-title" class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Birthday Surprise!</h1>
+
+        <div id="login-area">
+            <p class="mb-4 text-gray-600">Please log in with Spotify Premium to start the show!</p>
+            <button id="login-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm6.083 17.61c-.24.358-.698.482-1.056.242-2.952-1.814-6.625-2.22-10.947-1.214-.424.096-.84-.176-.936-.599-.096-.424.176-.84.599-.936 4.715-1.098 8.796-.638 12.044 1.36.358.24.482.698.242 1.056v-.009zm1.195-2.665c-.298.445-.86.595-1.305.3-3.445-2.104-8.658-2.72-12.444-1.49-.5.162-1.038-.126-1.199-.625-.162-.5.126-1.038.625-1.199 4.287-1.356 9.986-.687 13.876 1.718.445.298.595.86.3 1.305v-.004zm.11-2.862C19.05 10.03 11.47 9.73 6.706 10.97c-.59.152-1.217-.176-1.369-.766s.176-1.217.766-1.369c5.373-1.386 13.596-1.058 17.413 1.48.54.35.733 1.008.383 1.548-.35.54-.997.72-1.548.38v-.005z"></path></svg>
+                Login with Spotify
+            </button>
+            <p id="auth-error" class="text-red-500 mt-2 hidden"></p>
+            <p id="auth-status" class="text-blue-500 mt-2 hidden"></p>
+        </div>
+
+        <button id="start-button" class="hidden mt-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg text-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+            Click to Start Show!
+        </button>
+
+        <div id="slideshow-area" class="hidden mt-6">
+            <p id="status-indicator" class="mb-4 h-6">Initializing player...</p>
+            <div class="mb-6 relative aspect-video bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+                 <img id="slideshow-image" src=""  class="absolute top-0 left-0 w-full h-full object-cover image-fade-in">
+            </div>
+            <div class="flex items-center justify-center mt-4 space-x-2">
+                <img id="artist-image" src="" alt="Artist Photo" class="hidden w-8 h-8 md:w-10 md:h-10 rounded-full object-cover shadow">
+                <p id="track-info" class="text-sm font-medium text-gray-800 truncate"></p>
+            </div>
+            <div id="player-controls" class="mt-4 mb-2">
+                <button id="prev-button" title="Previous Track" disabled><i class="fas fa-backward-step"></i></button>
+                <button id="play-pause-button" title="Play/Pause" disabled><i class="fas fa-play"></i></button>
+                <button id="next-button" title="Next Track" disabled><i class="fas fa-forward-step"></i></button>
+            </div>
+        </div>
+
+        <div id="final-reveal" class="hidden mt-8">
+             <h1 class="text-3xl md:text-5xl font-bold animate-pulse">🎉 H A P P Y   B I R T H D A Y ! 🎉</h1>
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+
+    <script>
+        window.onSpotifyWebPlaybackSDKReady = () => {
+            window.__spotifySdkLoaded = true;
+        };
+    </script>
+    
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.3/gsap.min.js"></script>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

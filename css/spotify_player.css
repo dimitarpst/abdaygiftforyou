@@ -1,0 +1,109 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f7fafc; /* gray-100 */
+    transition: background-image 1.5s ease-in-out;
+}
+iframe { /* Style for potential future use, not SDK player */
+    border-radius: 0.5rem; /* rounded-lg */
+    border: none;
+}
+#final-reveal h1 {
+    font-size: 2rem; /* text-3xl */
+    font-weight: 700; /* font-bold */
+    letter-spacing: 0.1em; /* Wider spacing */
+    background: linear-gradient(to right, #ef4444, #f97316, #eab308, #84cc16, #22c55e, #14b8a6, #06b6d4, #3b82f6, #8b5cf6, #d946ef); /* Rainbow gradient */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
+#slideshow-image { transition: opacity 0.5s ease-in-out; }
+.image-fade-out { opacity: 0; }
+.image-fade-in { opacity: 1; }
+/* Spotify Login Button Style */
+#login-button {
+    background-color: #1DB954; /* Spotify Green */
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem; /* py-3 px-6 */
+    border-radius: 9999px; /* rounded-full */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem; /* space-x-2 */
+    transition: background-color 0.3s ease;
+}
+#login-button:hover {
+    background-color: #1AA34A;
+}
+/* Loading/Status Indicator */
+#status-indicator {
+    font-style: italic;
+    color: #6b7280; /* gray-500 */
+    min-height: 1.5rem; /* Ensure space for text */
+}
+/* Player Controls Styling */
+#player-controls button {
+    background-color: #e5e7eb; /* gray-200 */
+    color: #374151; /* gray-700 */
+    border: none;
+    border-radius: 9999px; /* rounded-full */
+    width: 3rem; /* w-12 */
+    height: 3rem; /* h-12 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem; /* text-lg */
+    margin: 0 0.5rem; /* mx-2 */
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+#player-controls button:hover:not(:disabled) {
+    background-color: #d1d5db; /* gray-300 */
+    transform: scale(1.05);
+}
+#player-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+#play-pause-button {
+    background-color: #a78bfa; /* violet-400 */
+    color: white;
+}
+ #play-pause-button:hover:not(:disabled) {
+     background-color: #8b5cf6; /* violet-500 */
+ }
+
+ /* shimmer keyframes */
+@keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200%  0; }
+  }
+  
+  /* skeleton state */
+  #slideshow-image.skeleton {
+    /* hide the <img> content until loaded */
+    opacity: 0;
+    /* show a gray gradient shimmer */
+    background-color: #e2e8f0;
+    background-image: linear-gradient(
+      90deg,
+      #e2e8f0 0%,
+      #f8fafc 50%,
+      #e2e8f0 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  /* once loaded, fade the real image in */
+  #slideshow-image.loaded {
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    background: none;       /* remove the shimmer bg */
+  }
+
+  #slideshow-image[src=""] {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
