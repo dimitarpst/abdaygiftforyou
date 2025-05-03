@@ -1,6 +1,9 @@
 // js/config.js  ───────────────────────────────────────────
-export const CLIENT_ID  = 'b008c63967424a379518b79158bdb177';   // ★ keep secret out of Git
-export const REDIRECT_URI = 'http://127.0.0.1:5501/index.html';
+export const CLIENT_ID  = 'b008c63967424a379518b79158bdb177';  
+export const REDIRECT_URI =
+  (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
+    ? 'http://127.0.0.1:5501/index.html'
+    : 'https://dimitarpst.github.io/abdaygiftforyou/';
 
 export const SPOTIFY_AUTHORIZE_ENDPOINT = 'https://accounts.spotify.com/authorize';
 export const SPOTIFY_TOKEN_ENDPOINT    = 'https://accounts.spotify.com/api/token';
