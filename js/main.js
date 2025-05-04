@@ -28,8 +28,6 @@ window.onload = async ()=>{
 
   if(accessToken){
     els.loginArea.classList.add('hidden');
-    els.ssArea.classList.remove('hidden');
-    els.statusTxt.textContent='Initializing player…';
     initPlayer(accessToken);
   }else{
     const p = new URLSearchParams(window.location.search);

@@ -5,6 +5,7 @@ import { els, disablePlayerControls, enablePlayerControls } from './ui.js';
 import { playlistData } from './config.js';
 import { state as sdkState } from './player.js';
 import { getValidStoredToken } from './auth.js';
+import { startFinalSequence } from './finalReveal.js';
 
 export let slideshowActive   = false;
 export let currentTrackIndex = 0;
@@ -47,6 +48,7 @@ function preloadImage(url) {
  * Fade-out current image, skeleton-load the next, then fade-in.
  */
 export async function showSlide(url) {
+  // console.log('🖼️ showSlide → url:', url, 'currentTrackIndex:', currentTrackIndex);
   if (!url) return;
 
   const img = els.ssImage;
@@ -73,7 +75,6 @@ export async function showSlide(url) {
 /* ---------------- Spotify Web-API playback ---------------- */
 export function playCurrentTrack(accessToken) {
   if (!sdkState.spotifyPlayer || !sdkState.deviceId) {
-    els.statusTxt.textContent = 'Error: Player not ready.';
     return;
   }
 
@@ -95,7 +96,6 @@ export function playCurrentTrack(accessToken) {
       enablePlayerControls();
     })
     .catch(e => {
-      els.statusTxt.textContent = `Error: ${e.message}`;
       slideshowActive = false;
       disablePlayerControls();
     });
@@ -133,6 +133,7 @@ export async function prevSlide(accessToken = getValidStoredToken()) {
 
 /* -------------- entry + finale -------------- */
 export function startSlideshow(accessToken) {
+  document.querySelector('#slideshow-area .relative')?.classList.remove('hidden');
   els.startBtn.classList.add('hidden');
   els.ssArea.classList.remove('hidden');
   els.mainTitle.textContent = 'Listen & Watch…';
@@ -145,11 +146,6 @@ export function startSlideshow(accessToken) {
   playCurrentTrack(accessToken);
 }
 
-export function revealFinalMessage() {
-  slideshowActive = false;
-  els.ssArea.classList.add('hidden');
-  els.mainTitle.classList.add('hidden');
-  els.finalMsg.classList.remove('hidden');
-  disablePlayerControls();
-  sdkState.spotifyPlayer?.disconnect();
+export function revealFinalMessage () {
+  startFinalSequence(getValidStoredToken());
 }

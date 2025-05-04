@@ -11,7 +11,6 @@ const authStatus = document.getElementById('auth-status');
 const startBtn   = document.getElementById('start-button');
 const ssArea     = document.getElementById('slideshow-area');
 const ssImage    = document.getElementById('slideshow-image');
-const statusTxt  = document.getElementById('status-indicator');
 const finalMsg   = document.getElementById('final-reveal');
 const mainTitle  = document.getElementById('main-title');
 
@@ -83,7 +82,7 @@ volumeWrap.parentNode.insertBefore(trackInfo, volumeWrap.nextSibling);
 export const els = {
   /* old */
   loginBtn, loginArea, authError, authStatus,
-  startBtn, ssArea, ssImage, statusTxt, finalMsg, mainTitle,
+  startBtn, ssArea, ssImage, finalMsg, mainTitle,
   prevBtn, ppBtn, ppIcon, nextBtn,
   /* new */
   seekBar, volumeSlider, currentTime, totalDuration, trackInfo

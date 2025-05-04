@@ -31,13 +31,8 @@
         </button>
 
         <div id="slideshow-area" class="hidden mt-6">
-            <p id="status-indicator" class="mb-4 h-6">Initializing player...</p>
-            <div class="mb-6 relative aspect-video bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+            <div class="hidden mb-6 relative aspect-video bg-gray-200 rounded-lg overflow-hidden shadow-lg">
                  <img id="slideshow-image" src=""  class="absolute top-0 left-0 w-full h-full object-cover image-fade-in">
-            </div>
-            <div class="flex items-center justify-center mt-4 space-x-2">
-                <img id="artist-image" src="" alt="Artist Photo" class="hidden w-8 h-8 md:w-10 md:h-10 rounded-full object-cover shadow">
-                <p id="track-info" class="text-sm font-medium text-gray-800 truncate"></p>
             </div>
             <div id="player-controls" class="mt-4 mb-2">
                 <button id="prev-button" title="Previous Track" disabled><i class="fas fa-backward-step"></i></button>
@@ -59,7 +54,42 @@
             window.__spotifySdkLoaded = true;
         };
     </script>
-    
+    <script>
+        // ← intercept Spotify analytics fetches to avoid 404 noise
+        const _origFetch = window.fetch;
+        window.fetch = async function(input, init) {
+          const url = typeof input === 'string'
+            ? input
+            : input instanceof Request
+              ? input.url
+              : input.toString();
+      
+          // catch cpapi.analytics calls
+          if (url.includes('cpapi.spotify.com') && url.includes('event/item_before_load')) {
+            try {
+              const resp = await _origFetch(input, init);
+              if (resp.status === 400 || resp.status === 404) {
+                console.log(`⚡️ Intercepted analytics ${resp.status}:`, url.split('?')[0]);
+                return new Response(JSON.stringify({ success: true }), {
+                  status: 200,
+                  headers: { 'Content-Type': 'application/json' }
+                });
+              }
+              return resp;
+            } catch (err) {
+              console.warn(`⚡️ Analytics fetch error:`, err);
+              return new Response(JSON.stringify({ success: true }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' }
+              });
+            }
+          }
+      
+          // all other fetches remain normal
+          return _origFetch(input, init);
+        };
+      </script>
+      
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.3/gsap.min.js"></script>

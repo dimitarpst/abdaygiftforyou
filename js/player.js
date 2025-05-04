@@ -49,7 +49,6 @@ function stopProgressTimer() {
 /* ---------------------------------------------------------- */
 export function initPlayer() {
   if (!window.Spotify?.Player) {
-    els.statusTxt.textContent = 'Error: Spotify SDK failed to load.';
     return;
   }
 
@@ -58,15 +57,16 @@ export function initPlayer() {
   state.spotifyPlayer = new Spotify.Player({
     name: 'Birthday Slideshow Player (PKCE)',
     getOAuthToken: cb => {
-      const t = getValidStoredToken();
-      t ? cb(t) : (els.statusTxt.textContent = 'Session expired – please log in again.');
+      const token = getValidStoredToken();
+      if (token) {
+        cb(token);
+      } 
     },
     volume: 0.5
   });
 
   state.spotifyPlayer.addListener('ready', ({ device_id }) => {
     state.deviceId = device_id;
-    els.statusTxt.textContent = 'Player ready! Click Start.';
     enablePlayerControls();
     els.loginArea.classList.add('hidden');
     els.startBtn.classList.remove('hidden');
@@ -84,11 +84,9 @@ export function initPlayer() {
 
   state.spotifyPlayer.addListener('player_state_changed', onPlayerStateChanged);
   state.spotifyPlayer.addListener('initialization_error', ({ message }) => {
-    els.statusTxt.textContent = `Init error: ${message}`;
     disablePlayerControls();
   });
   state.spotifyPlayer.addListener('authentication_error', ({ message }) => {
-    els.statusTxt.textContent = `Auth error: ${message}`;
     clearTokenInfo();
     disablePlayerControls();
   });
@@ -106,6 +104,9 @@ export function togglePlay() {
 
 /* ---------------------------------------------------------- */
 async function onPlayerStateChanged(s) {
+
+
+
   // 1. Handle No State (Player disconnected, etc.)
   if (!s) {
     // console.log("Player state is null.");
@@ -152,17 +153,30 @@ async function onPlayerStateChanged(s) {
 
 
   // 4. Check if Track Changed and if it's in our Playlist
-  const idx = playlistData.findIndex(p => p.trackUri === nowUri);
+  const spotifyId = nowUri.split(':').pop();          
+  const idx = playlistData.findIndex(p =>
+    p.trackUri.endsWith(spotifyId)
+  );
   const newTrack = !prevSnapshot || nowUri !== prevSnapshot.track_window?.current_track?.uri;
-
   // 5. Handle New Track Logic (Slideshow Image, Background Colors)
+  // console.log(
+  //   '%c🔍 Debug track', 'color: magenta; font-weight: bold;',
+  //   { nowUri, idx, newTrack }
+  // );
   if (idx !== -1 && newTrack) {
-    // console.log(`New track detected (Index ${idx}): ${nowName}`);
+    // console.log(`LALA New track detected (Index ${idx}): ${nowName}`);
+
     const albumArtUrl = albumImages.length ? albumImages[0].url : playlistData[idx].imageUrl; // Prefer largest image, fallback to stored one
+    // console.log(`Track ${idx} (“${nowName}”) → albumImages:`, albumImages);
+    // console.log(`… selected albumArtUrl:`, albumArtUrl);
 
     if (albumArtUrl) {
         // Update stored image URL and show slide (as before)
         playlistData[idx].imageUrl = albumArtUrl;
+        const artistList = currentTrack.artists.map(a => a.name);   // <— make the array first
+        playlistData[idx].trackName   = nowName;
+        playlistData[idx].trackArtist = artistList.join(', ');
+
         showSlide(albumArtUrl);
 
         // --- Background Color Extraction ---
@@ -184,9 +198,33 @@ async function onPlayerStateChanged(s) {
 
                     // console.log(`Applying background gradient: ${color1}, ${color2}`);
                     // Apply gradient to body (ensure CSS transition is set on body)
+
+                    function mixColors(hex1, hex2) {
+                      const rgb1 = hexToRgb(hex1);
+                      const rgb2 = hexToRgb(hex2);
+                      const avg = {
+                        r: Math.round((rgb1.r + rgb2.r) / 2),
+                        g: Math.round((rgb1.g + rgb2.g) / 2),
+                        b: Math.round((rgb1.b + rgb2.b) / 2)
+                      };
+                      return `rgb(${avg.r}, ${avg.g}, ${avg.b})`;
+                    }
+                    
+                    function hexToRgb(hex) {
+                      const raw = hex.replace('#', '');
+                      const bigint = parseInt(raw, 16);
+                      return {
+                        r: (bigint >> 16) & 255,
+                        g: (bigint >> 8) & 255,
+                        b: bigint & 255
+                      };
+                    }
+                    
                     document.body.style.backgroundImage = `linear-gradient(to bottom right, ${color1}, ${color2})`;
-                    document.documentElement.style.setProperty('--accent-secondary',  color2);
                     document.documentElement.style.setProperty('--accent', color1);
+                    document.documentElement.style.setProperty('--accent-secondary', color2);
+                    document.documentElement.style.setProperty('--accent-tertiary', mixColors(color1, color2));
+                    
                 } catch (e) {
                     console.error('ColorThief extraction error:', e);
                     // Fallback gradient on extraction error
@@ -245,9 +283,8 @@ async function onPlayerStateChanged(s) {
     !prevSnapshot.paused &&           // Was playing before
     s.paused &&                       // Is paused now
     s.position === 0 &&               // Position is at the start
-    s.restrictions.pause === false && // Ensure pause wasn't due to restriction
-    nowUri === prevSnapshot.track_window?.current_track?.uri && // Still same track URI
-    nowUri !== lastHandledUri;        // Avoid double-handling
+    nowUri === prevSnapshot.track_window?.current_track?.uri &&
+    nowUri !== lastHandledUri;
 
   if (trackJustFinished) {
     // console.log(`Track finished: ${nowName}`);

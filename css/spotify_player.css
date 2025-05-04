@@ -36,12 +36,7 @@ iframe { /* Style for potential future use, not SDK player */
 #login-button:hover {
     background-color: #1AA34A;
 }
-/* Loading/Status Indicator */
-#status-indicator {
-    font-style: italic;
-    color: #6b7280; /* gray-500 */
-    min-height: 1.5rem; /* Ensure space for text */
-}
+
 /* Player Controls Styling */
 #player-controls button {
     background-color: #e5e7eb; /* gray-200 */
@@ -107,3 +102,5 @@ iframe { /* Style for potential future use, not SDK player */
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
   }
+
+  
