@@ -67,53 +67,43 @@ export async function redirectToSpotifyLogin() {
  * @returns {Promise<string|null>}  access token or null on error
  */
 export async function fetchAndStoreAccessToken(code) {
-  const codeVerifier = sessionStorage.getItem(CODE_VERIFIER_STORAGE_KEY);
-  if (!codeVerifier) {
+  const verifier = sessionStorage.getItem(CODE_VERIFIER_STORAGE_KEY);
+  if (!verifier) {
     showError('Auth error: code verifier missing. Please log in again.');
     return null;
   }
 
   const params = new URLSearchParams({
-    client_id     : CLIENT_ID,
-    grant_type    : 'authorization_code',
+    grant_type:    'authorization_code',
     code,
-    redirect_uri  : REDIRECT_URI,
-    code_verifier : codeVerifier
+    redirect_uri:  REDIRECT_URI,
+    client_id:     CLIENT_ID,
+    code_verifier: verifier
   });
 
-  try {
-    const r = await fetch(SPOTIFY_TOKEN_ENDPOINT, {
-      method  : 'POST',
-      headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body    : params.toString()
-    });
-
-    if (!r.ok) {
-      const err = await r.json();
-      showError(`Authentication failed: ${err.error_description || err.error || r.statusText}.`);
-      clearTokenInfo();
-      return null;
-    }
-
-    const tokenData = await r.json();
-
-    /* save token + expiry (minus 60 s buffer) */
-    const expiry = Date.now() + (tokenData.expires_in - 60) * 1000;
-    localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY,  tokenData.access_token);
-    localStorage.setItem(TOKEN_EXPIRY_STORAGE_KEY,  expiry.toString());
-    if (tokenData.refresh_token) {
-      localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, tokenData.refresh_token);
-    }
-    scheduleTokenRefresh(expiry);
-
-    sessionStorage.removeItem(CODE_VERIFIER_STORAGE_KEY);
-    return tokenData.access_token;
-  } catch (e) {
-    showError(`Authentication failed: ${e.message}.`);
+  const r = await fetch(SPOTIFY_TOKEN_ENDPOINT, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body:    params.toString()
+  });
+  const data = await r.json();
+  if (!r.ok) {
+    showError(`Authentication failed: ${data.error_description||data.error}.`);
     clearTokenInfo();
-    sessionStorage.removeItem(CODE_VERIFIER_STORAGE_KEY);
     return null;
   }
+
+  // store tokens + expiry (minus 60s buffer) :contentReference[oaicite:2]{index=2}:contentReference[oaicite:3]{index=3}
+  const expiry = Date.now() + (data.expires_in - 60) * 1000;
+  localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY,  data.access_token);
+  localStorage.setItem(TOKEN_EXPIRY_STORAGE_KEY,  expiry.toString());
+  if (data.refresh_token) {
+    localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, data.refresh_token);
+  }
+  scheduleTokenRefresh(expiry);
+
+  sessionStorage.removeItem(CODE_VERIFIER_STORAGE_KEY);
+  return data.access_token;
 }
 
 // with this
@@ -141,39 +131,47 @@ let refreshTimeoutId;
 /** schedule refresh 1 min before expiry */
 function scheduleTokenRefresh(expiryMs) {
   clearTimeout(refreshTimeoutId);
-  const delay = Math.max(5_000, expiryMs - Date.now() - 60_000);
-  refreshTimeoutId = setTimeout(refreshAccessToken, delay);
+  const delay = Math.max(5000, expiryMs - Date.now() - 60000);
+  console.log(`🔄 scheduling token refresh in ${Math.round(delay/1000)}s`);
+  refreshTimeoutId = setTimeout(async () => {
+    console.log('🔄 performing token refresh now');
+    await refreshAccessToken();
+  }, delay);
 }
+
 
 /** swap an expired access-token for a fresh one */
 export async function refreshAccessToken() {
   const refreshToken = localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY);
   if (!refreshToken) return null;
 
-  const body = new URLSearchParams({
-    client_id    : CLIENT_ID,
-    grant_type   : 'refresh_token',
-    refresh_token: refreshToken
+  const params = new URLSearchParams({
+    grant_type:    'refresh_token',
+    refresh_token: refreshToken,
+    client_id:     CLIENT_ID
   });
 
-  try {
-    const r = await fetch(SPOTIFY_TOKEN_ENDPOINT, {
-      method : 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body   : body.toString()
-    });
-    if (!r.ok) throw new Error('refresh failed');
-
-    const t = await r.json();
-    const expiry = Date.now() + (t.expires_in - 60) * 1000;
-    localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY,  t.access_token);
-    localStorage.setItem(TOKEN_EXPIRY_STORAGE_KEY,  expiry.toString());
-    scheduleTokenRefresh(expiry);
-    return t.access_token;
-  } catch {
+  const r = await fetch(SPOTIFY_TOKEN_ENDPOINT, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body:    params.toString()
+  });
+  const t = await r.json();
+  if (!r.ok) {
     clearTokenInfo();
     return null;
   }
+
+  // update stored access token + expiry :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
+  const expiry = Date.now() + (t.expires_in - 60) * 1000;
+  localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, t.access_token);
+  localStorage.setItem(TOKEN_EXPIRY_STORAGE_KEY, expiry.toString());
+
+  if (t.refresh_token) {
+      localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, t.refresh_token);
+    }
+  scheduleTokenRefresh(expiry);
+  return t.access_token;
 }
 
 /* internal helper */
@@ -181,3 +179,5 @@ function showError(msg) {
   els.authError.textContent = msg;
   els.authError.classList.remove('hidden');
 }
+window.scheduleTokenRefresh = scheduleTokenRefresh;
+window.refreshAccessToken   = refreshAccessToken;
