@@ -37,11 +37,14 @@ export function initEqualizer(barCount = 50) {
   min-width:2px;                /* prevent collapse */
   height:70%;
 background: linear-gradient(
-      to top,
-      var(--accent, #f472b6) 0%,
-      var(--accent-secondary, #a855f7) 50%,
-      var(--accent-tertiary, #6366f1) 100%
-    );
+  to top,
+  var(--accent, #f472b6) 0%,
+  var(--accent-secondary, #a855f7) 20%,
+  var(--accent-tertiary, #6366f1) 40%,
+  var(--accent-tertiary, #6366f1) 60%,
+  var(--accent-secondary, #a855f7) 80%,
+  var(--accent, #f472b6) 100%
+);
   background-size:100% 400%;
   border-radius:6px;
   box-shadow:

@@ -13,7 +13,8 @@ export const SCOPES = [
   'user-read-email',
   'user-read-private',
   'user-modify-playback-state',
-  'user-read-playback-state'
+  'user-read-playback-state',
+  'playlist-modify-public'
 ];
 
 export const CODE_VERIFIER_STORAGE_KEY = 'spotify_code_verifier';

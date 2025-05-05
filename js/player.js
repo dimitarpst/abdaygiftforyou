@@ -71,7 +71,7 @@ export function initPlayer() {
     els.loginArea.classList.add('hidden');
     els.startBtn.classList.remove('hidden');
 
-    initEqualizer();
+    initEqualizer(200);
     state.spotifyPlayer.getVolume().then(v => {
       els.volumeSlider.value = Math.round(v * 100);
     });
@@ -226,6 +226,10 @@ async function onPlayerStateChanged(s) {
                     document.documentElement.style.setProperty('--accent', color1);
                     document.documentElement.style.setProperty('--accent-secondary', color2);
                     document.documentElement.style.setProperty('--accent-tertiary', mixColors(color1, color2));
+                    document.documentElement.style.setProperty('--dynamic-grad-1', color1);
+                    document.documentElement.style.setProperty('--dynamic-grad-2', color2);
+                    document.documentElement.style.setProperty('--dynamic-grad-3', mixColors(color1, color2));
+
                     
                 } catch (e) {
                     console.error('ColorThief extraction error:', e);

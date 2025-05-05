@@ -238,3 +238,45 @@ iframe { /* Style for potential future use, not SDK player */
     transform: translateY(-2px);
   }
   
+  #continue-button {
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #1DB954;
+    color: #000;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 9999px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+  }
+  
+  #continue-button:hover {
+    background-color: #1ED760;
+    transform: translateY(-4px);
+  }
+
+
+  #app-body {
+    /* keep your three stops */
+    background: linear-gradient(
+      270deg,
+      var(--dynamic-grad-1) 0%,
+      var(--dynamic-grad-2)  50%,
+      var(--dynamic-grad-3) 100%
+    );
+    /* bigger so the shift looks more dramatic */
+    background-size: 2000% 2000%;
+    /* linear + alternate yields a smooth ping‑pong motion */
+    animation: gradientShift 10s ease-in-out infinite alternate;
+  }
+  
+  @keyframes gradientShift {
+    0%   { background-position:   0%  50%; }
+    25%  { background-position:  50% 100%; }
+    50%  { background-position: 100%  50%; }
+    75%  { background-position:  50%   0%; }
+    100% { background-position:   0%  50%; }
+  }
+  
