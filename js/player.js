@@ -219,6 +219,8 @@ async function onPlayerStateChanged(s) {
                         b: bigint & 255
                       };
                     }
+
+                    
                     
                     document.body.style.backgroundImage = `linear-gradient(to bottom right, ${color1}, ${color2})`;
                     document.documentElement.style.setProperty('--accent', color1);

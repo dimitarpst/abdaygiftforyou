@@ -133,3 +133,108 @@ iframe { /* Style for potential future use, not SDK player */
     z-index: 1;
   }
   
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    background: transparent; /* so our pseudo track shows through */
+  }
+  
+  /* WebKit: full track */
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(
+      to right,
+      var(--accent),
+      var(--accent-secondary)
+    );
+  }
+  
+  /* WebKit: thumb */
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    margin-top: -4px;         /* center the thumb on the track */
+    background: var(--accent-tertiary);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  /* Firefox: the track */
+  input[type="range"]::-moz-range-track {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--accent-secondary, #ccc);
+  }
+  
+  /* Firefox: the filled portion */
+  input[type="range"]::-moz-range-progress {
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(
+      to right,
+      var(--accent),
+      var(--accent-secondary)
+    );
+  }
+  
+  /* Firefox: thumb */
+  input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--accent-tertiary);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  /* IE/Edge Legacy: fill lower/upper */
+  input[type="range"]::-ms-fill-lower {
+    background: linear-gradient(
+      to right,
+      var(--accent),
+      var(--accent-secondary)
+    );
+    border-radius: 3px;
+  }
+  input[type="range"]::-ms-fill-upper {
+    background: var(--accent-secondary);
+    border-radius: 3px;
+  }
+  input[type="range"]::-ms-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--accent-tertiary);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  #player-controls button {
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+    transition: transform 500ms ease, box-shadow 500ms ease;
+  }
+  
+  #player-controls button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent-secondary), var(--accent));
+    opacity: 0;
+    transition: opacity 500ms ease-in-out;
+    z-index: -1;
+  }
+  
+  #player-controls button:hover::before {
+    opacity: 1;
+  }
+  
+  #player-controls button:hover {
+    transform: translateY(-2px);
+  }
+  
