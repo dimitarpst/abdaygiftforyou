@@ -102,5 +102,34 @@ iframe { /* Style for potential future use, not SDK player */
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
   }
-
+  .letter-square {
+    position: relative;  /* needed for the overlay */
+  }
+  
+  .letter-square::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0); /* tweak opacity as needed */
+    border-radius: inherit;
+    z-index: 0;
+  }
+  
+  .letter-square span {
+    position: relative;
+    z-index: 1;            /* keep letters above the overlay */
+  }
+  
+  #my-love-banner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    border-radius: inherit;
+    z-index: 0;
+  }
+  #my-love-banner > span {
+    position: relative;
+    z-index: 1;
+  }
   
