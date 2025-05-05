@@ -71,7 +71,7 @@ export function initPlayer() {
     els.loginArea.classList.add('hidden');
     els.startBtn.classList.remove('hidden');
 
-    initEqualizer(200);
+    initEqualizer(100);
     state.spotifyPlayer.getVolume().then(v => {
       els.volumeSlider.value = Math.round(v * 100);
     });

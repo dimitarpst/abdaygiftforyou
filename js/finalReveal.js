@@ -550,10 +550,21 @@ export async function startFinalSequence(token = getValidStoredToken()) {
         console.warn("Spotify player SDK instance not available to pause.");
     }
     await new Promise(resolve => setTimeout(resolve, 200)); // Short delay to ensure pause command is processed
+    const appEl = document.getElementById('app-container');
+    appEl.style.overflow = 'hidden';
 
     // Hide slideshow elements and disable player controls
-    els.ssArea?.classList.add('hidden');
-    els.mainTitle?.classList.add('hidden');
+    await gsap.to([els.ssArea, els.mainTitle], {
+      height: 0,
+      opacity: 0,
+      padding: 0,
+      margin: 0,
+      duration: 0.8,
+      ease: 'power1.in'
+    }).then(() => {
+      els.ssArea.classList.add('hidden');
+      els.mainTitle.classList.add('hidden');
+    });
     if (typeof disablePlayerControls === 'function') {
          disablePlayerControls(); // Call the imported function
          console.log("Player controls disabled.");
@@ -751,8 +762,8 @@ export async function startFinalSequence(token = getValidStoredToken()) {
         const squaresStartTime = currentTime - 1.0; // Overlap: Start 1s before card sequence ends
         const squaresRevealDuration = 1.5;
         const letterScaleStartTime = squaresStartTime + 0.2;
-        const letterScaleDuration = 1.2;
-        const letterStagger = 0.14;
+        const letterScaleDuration = 5;
+        const letterStagger = 0.2;
         // Calculate approx end time for last letter scaling
         const lastLetterScaleEndTime = letterScaleStartTime + (letterEls.length - 1) * letterStagger + letterScaleDuration;
 

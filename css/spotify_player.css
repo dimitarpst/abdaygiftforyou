@@ -262,9 +262,9 @@ iframe { /* Style for potential future use, not SDK player */
     /* keep your three stops */
     background: linear-gradient(
       270deg,
-      var(--dynamic-grad-1) 0%,
-      var(--dynamic-grad-2)  50%,
-      var(--dynamic-grad-3) 100%
+      var(--dynamic-grad-1, #fbc2eb) 0%,
+      var(--dynamic-grad-2, #a6c1ee)  50%,
+      var(--dynamic-grad-3, #89f7fe) 100%
     );
     /* bigger so the shift looks more dramatic */
     background-size: 2000% 2000%;

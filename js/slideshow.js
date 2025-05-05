@@ -108,12 +108,15 @@ export async function nextSlide(accessToken = getValidStoredToken()) {
     revealFinalMessage();
     return;
   }
+  await gsap.to('#slideshow-area .relative', { opacity: 0, duration: 0.5 }).then();
 
   await rampVolume(0, 300);           // volume OUT
   currentTrackIndex++;
   await showSlide(playlistData[currentTrackIndex].imageUrl);
   playCurrentTrack(accessToken);
 const currentVolume = els.volumeSlider.value / 100;
+await gsap.to('#slideshow-area .relative', { opacity: 1, duration: 0.5 }).then();
+
 await rampVolume(currentVolume, 300); // volume IN to slider level
 }
 
@@ -122,12 +125,15 @@ export async function prevSlide(accessToken = getValidStoredToken()) {
     sdkState.spotifyPlayer.seek(0);
     return;
   }
+  await gsap.to('#slideshow-area .relative', { opacity: 0, duration: 0.5 }).then();
 
   await rampVolume(0, 300);
   currentTrackIndex--;
   await showSlide(playlistData[currentTrackIndex].imageUrl);
   playCurrentTrack(accessToken);
   const currentVolume = els.volumeSlider.value / 100;
+  await gsap.to('#slideshow-area .relative', { opacity: 1, duration: 0.5 }).then();
+
   await rampVolume(currentVolume, 300); // volume IN to slider level
 }
 
