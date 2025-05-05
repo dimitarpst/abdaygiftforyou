@@ -365,14 +365,110 @@ function buildDom() {
     replayButton.onclick = () => window.location.reload(); // Simple page reload for replay
     finalButtonsContainer.appendChild(replayButton);
 
-    // Spotify Button
-    const spotifyButton = document.createElement('button');
-    spotifyButton.id = 'spotify-button';
-    spotifyButton.className = 'final-action-button spotify'; // Shared + specific style
-    spotifyButton.innerHTML = '<i class="fab fa-spotify mr-2"></i> Open Spotify'; // Icon + text
-    // IMPORTANT: Replace with your actual playlist link
-    spotifyButton.onclick = () => window.open('https://open.spotify.com/playlist/YOUR_PLAYLIST_ID', '_blank'); // Replace with actual link
-    finalButtonsContainer.appendChild(spotifyButton);
+// --- Replace this block in finalReveal.js ---
+const spotifyButton = document.createElement('button');
+spotifyButton.id    = 'spotify-button';
+spotifyButton.className = 'final-action-button spotify';
+spotifyButton.innerHTML = '<i class="fab fa-spotify mr-2"></i> Create & Save Playlist';
+finalButtonsContainer.appendChild(spotifyButton);
+
+// --- Add this below it ---
+spotifyButton.addEventListener('click', async () => {
+  const token = getValidStoredToken();
+  if (!token) {
+    alert('Please log in first!');
+    return;
+  }
+
+  spotifyButton.disabled = true;
+  spotifyButton.textContent = 'Gathering…';
+
+  // 1) Gather animation
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position: fixed; inset:0;
+    pointer-events: none;
+    z-index: 9999;
+  `;
+  document.body.appendChild(overlay);
+
+  playlistData.forEach((t, i) => {
+    const dot = document.createElement('div');
+    Object.assign(dot.style, {
+      position:  'absolute',
+      width:     '10px',
+      height:    '10px',
+      borderRadius: '50%',
+      background: 'var(--accent)',
+      left:      `${10 + Math.random()*80}%`,
+      top:       `${10 + Math.random()*80}%`,
+      transform: 'translate(-50%, -50%)'
+    });
+    overlay.appendChild(dot);
+    // animate into the button center
+    const rect = spotifyButton.getBoundingClientRect();
+    gsap.to(dot, {
+      x: rect.left + rect.width/2  - dot.offsetLeft,
+      y: rect.top  + rect.height/2 - dot.offsetTop,
+      delay: i * 0.05,
+      duration: 0.4,
+      ease: 'power2.in'
+    });
+  });
+
+  // wait animation
+  await new Promise(r => setTimeout(r, playlistData.length * 50 + 400));
+
+  // 2) Spotify API calls
+  // 2a) get me
+  const me = await fetch('https://api.spotify.com/v1/me', {
+    headers: { Authorization: `Bearer ${token}` }
+  }).then(r=>r.json());
+  // 2b) create playlist
+  const playlist = await fetch(
+    `https://api.spotify.com/v1/users/${me.id}/playlists`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name:        "Aylin's Special Playlist",
+        description: 'Handcrafted with love 💖',
+        public:      false
+      })
+    }
+  ).then(r=>r.json());
+  // 2c) add tracks
+  await fetch(
+    `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        uris: playlistData.map(p => p.trackUri)
+      })
+    }
+  );
+
+  // 3) Open it
+// build a safe URL from the Spotify response (or fallback if missing)
+const spotifyUrl =
+  playlist.external_urls?.spotify ||
+  `https://open.spotify.com/playlist/${playlist.id}`;
+
+window.open(spotifyUrl, '_blank');
+
+
+  // cleanup
+  overlay.remove();
+  spotifyButton.textContent = 'All Set! 🎶';
+});
+
 
     // --- Container for confetti (starts hidden) ---
     const confettiContainer = document.createElement('div');
